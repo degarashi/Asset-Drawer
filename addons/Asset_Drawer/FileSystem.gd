@@ -39,7 +39,10 @@ func _enter_tree() -> void:
 	file_split_container.split_offset = 175
 
 	# Get shortcut
-	asset_drawer_shortcut = preload("res://addons/Asset_Drawer/AssetDrawerShortcut.tres") as InputEventKey
+	asset_drawer_shortcut = (
+		preload("res://addons/Asset_Drawer/AssetDrawerShortcut.tres") as InputEventKey
+	)
+
 
 func init_file_dock() -> void:
 	# Get our file system
@@ -47,6 +50,7 @@ func init_file_dock() -> void:
 	file_split_container = file_dock.get_child(3) as SplitContainer
 	file_tree = file_split_container.get_child(0) as Tree
 	file_container = file_split_container.get_child(1) as VBoxContainer
+
 
 #region show hide filesystem
 func _input(event: InputEvent) -> void:
@@ -60,7 +64,10 @@ func _input(event: InputEvent) -> void:
 			make_bottom_panel_item_visible(file_dock)
 
 		showing = not showing
+
+
 #endregion
+
 
 func _exit_tree() -> void:
 	remove_tool_menu_item("Files to Bottom")
