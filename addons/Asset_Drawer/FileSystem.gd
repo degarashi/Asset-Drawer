@@ -112,8 +112,8 @@ func _process(_delta: float) -> void:
 		# Centers window on first pop
 		if not initial_load:
 			initial_load = true
-			var screenSize: Vector2 = DisplayServer.screen_get_size()
-			window.position = screenSize / 2
+			var screen_size: Vector2 = DisplayServer.screen_get_size()
+			window.position = screen_size / 2
 
 
 # Moves the files between the bottom panel and the original dock
