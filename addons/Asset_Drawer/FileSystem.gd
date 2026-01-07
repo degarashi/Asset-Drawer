@@ -99,8 +99,9 @@ func _process(_delta: float) -> void:
 		var fontsize: int = editorsettings.get_setting("interface/editor/main_font_size")
 		var editorscale := EditorInterface.get_editor_scale()
 
-		fd_info.tree.size.y = new_size.y - (fontsize * 2) - (BOTTOM_PADDING * editorscale)
-		fd_info.container.size.y = new_size.y - (fontsize * 2) - (BOTTOM_PADDING * editorscale)
+		var sz_y := new_size.y - (fontsize * 2) - (BOTTOM_PADDING * editorscale)
+		fd_info.tree.size.y = sz_y
+		fd_info.container.size.y = sz_y
 		return
 
 	# Keeps our systems sized when popped out
