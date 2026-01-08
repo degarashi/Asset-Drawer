@@ -20,7 +20,6 @@ const INSPECTOR = preload("uid://dbp3g3xta2t52")
 var inspector: EditorInspectorPlugin
 var fd_info: FDInfo
 var asset_drawer_shortcut: InputEventKey = InputEventKey.new()
-var asset_drawer_browse_at: InputEventKey = InputEventKey.new()
 
 ## Toggle for when the file system is moved to bottom
 var files_bottom: bool = false
@@ -48,7 +47,6 @@ func _enter_tree() -> void:
 
 	# Get shortcuts
 	asset_drawer_shortcut = preload("res://addons/Asset_Drawer/AssetDrawerShortcut.tres")
-	asset_drawer_browse_at = preload("res://addons/Asset_Drawer/AssetDrawerBrowseAt.tres")
 
 	inspector = INSPECTOR.new()
 	inspector.select_resource.connect(_on_select_resource)
