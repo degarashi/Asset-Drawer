@@ -73,7 +73,7 @@ func _open_path(path: String) -> void:
 
 	if files_bottom:
 		make_bottom_panel_item_visible(fd_info.dock)
-	AUXF.navigate_to_path_manual(fd_info, path)
+	EditorInterface.select_file(path)
 
 
 func _on_obj_changed() -> void:
