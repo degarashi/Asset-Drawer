@@ -14,7 +14,6 @@ const BOTTOM_PADDING: int = 60
 const MIN_HEIGHT: int = 50
 
 const FDInfo = preload("uid://cnhpfa51sruip")
-const AUXF = preload("uid://uey8lki27h52")
 const INSPECTOR = preload("uid://dbp3g3xta2t52")
 
 var inspector: EditorInspectorPlugin
