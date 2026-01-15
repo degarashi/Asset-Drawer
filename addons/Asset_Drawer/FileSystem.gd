@@ -3,7 +3,6 @@ extends EditorPlugin
 
 # Prevent continuous operation
 const OPERATE_DELAY = 0.25
-const OPERATE_KEY = KEY_ALT
 ## The root scene
 const ROOT: StringName = &"root"
 ## Padding from the bottom when popped out
@@ -75,10 +74,15 @@ func _open_path(path: String) -> void:
 	EditorInterface.select_file(path)
 
 
+func _is_operate_key_pressed() -> bool:
+	const OPERATE_KEY = KEY_ALT
+	return Input.is_key_pressed(OPERATE_KEY)
+
+
 func _on_obj_changed() -> void:
 	last_operated = Time.get_unix_time_from_system()
 	# Open the .tscn associated with the node
-	if Input.is_key_pressed(OPERATE_KEY):
+	if _is_operate_key_pressed():
 		var insp := EditorInterface.get_inspector()
 		var obj := insp.get_edited_object()
 		var node := obj as Node
@@ -89,7 +93,7 @@ func _on_obj_changed() -> void:
 
 
 func _on_select_property(property: String) -> void:
-	if Input.is_key_pressed(OPERATE_KEY):
+	if _is_operate_key_pressed():
 		var insp := EditorInterface.get_inspector()
 		var obj := insp.get_edited_object()
 		var res := obj.get(property) as Resource
@@ -100,7 +104,7 @@ func _on_select_property(property: String) -> void:
 
 func _on_select_resource(path: String) -> void:
 	await get_tree().create_timer(0.1).timeout
-	if Input.is_key_pressed(OPERATE_KEY):
+	if _is_operate_key_pressed():
 		if _check_operate_interval():
 			_open_path(path)
 
