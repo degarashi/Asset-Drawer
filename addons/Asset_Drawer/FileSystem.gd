@@ -75,8 +75,23 @@ func _open_path(path: String) -> void:
 
 
 func _is_operate_key_pressed() -> bool:
-	const OPERATE_KEY = KEY_ALT
-	return Input.is_key_pressed(OPERATE_KEY)
+	return (
+		Input.is_key_pressed(KEY_ALT)
+		and not Input.is_key_pressed(KEY_SHIFT)
+		and not Input.is_key_pressed(KEY_CTRL)
+		and not (
+			Input.is_key_pressed(KEY_0)
+			or Input.is_key_pressed(KEY_1)
+			or Input.is_key_pressed(KEY_2)
+			or Input.is_key_pressed(KEY_3)
+			or Input.is_key_pressed(KEY_4)
+			or Input.is_key_pressed(KEY_5)
+			or Input.is_key_pressed(KEY_6)
+			or Input.is_key_pressed(KEY_7)
+			or Input.is_key_pressed(KEY_8)
+			or Input.is_key_pressed(KEY_9)
+		)
+	)
 
 
 func _on_obj_changed() -> void:
