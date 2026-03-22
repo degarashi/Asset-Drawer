@@ -55,7 +55,7 @@ func _enter_tree() -> void:
 	insp.edited_object_changed.connect(_on_obj_changed)
 
 
-# last_operatedからOPERATE_DELAY分の時間が経っているか & 時間の更新
+# Check if OPERATE_DELAY has passed since last_operated & Update time
 func _check_operate_interval() -> bool:
 	if Time.get_unix_time_from_system() - last_operated < OPERATE_DELAY:
 		return false
