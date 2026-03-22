@@ -168,6 +168,12 @@ func _process(_delta: float) -> void:
 		var editorscale := EditorInterface.get_editor_scale()
 
 		var sz_y := new_size.y - (fontsize * 2) - (BOTTOM_PADDING * editorscale)
+
+		# Apply offset for Godot 4.6+ as a workaround
+		var version_info := Engine.get_version_info()
+		if version_info.major >= 4 and version_info.minor >= 6:
+			sz_y += 25
+
 		fd_info.tree.size.y = sz_y
 		fd_info.container.size.y = sz_y
 		return
