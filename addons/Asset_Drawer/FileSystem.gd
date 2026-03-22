@@ -20,7 +20,7 @@ var fd_info: FDInfo
 var asset_drawer_shortcut: InputEventKey = InputEventKey.new()
 
 ## Toggle for when the file system is moved to bottom
-var files_bottom: bool = false
+var is_in_bottom_panel: bool = false
 var new_size: Vector2
 var initial_load: bool = false
 var showing: bool = false
@@ -69,7 +69,7 @@ func _open_path(path: String) -> void:
 	if ar.size() > 2:
 		return
 
-	if files_bottom:
+	if is_in_bottom_panel:
 		make_bottom_panel_item_visible(fd_info.dock)
 	EditorInterface.select_file(path)
 
@@ -126,7 +126,7 @@ func _on_select_resource(path: String) -> void:
 
 #region show hide filesystem
 func _input(event: InputEvent) -> void:
-	if not files_bottom:
+	if not is_in_bottom_panel:
 		return
 
 	# Asset drawer toggle
@@ -153,14 +153,14 @@ func _process(_delta: float) -> void:
 	new_size = window.size
 
 	# Keeps the file system from being unusable in size
-	if window.name == ROOT and not files_bottom:
+	if window.name == ROOT and not is_in_bottom_panel:
 		fd_info.tree.size.y = new_size.y - PADDING
 		fd_info.container.size.y = new_size.y - PADDING
 		return
 
 	# Adjust the size of the file system based on how far up
 	# the drawer has been pulled
-	if window.name == ROOT and files_bottom:
+	if window.name == ROOT and is_in_bottom_panel:
 		var dock_container := fd_info.dock.get_parent() as Control
 		new_size = dock_container.size
 		var editorsettings := EditorInterface.get_editor_settings()
@@ -179,7 +179,7 @@ func _process(_delta: float) -> void:
 		return
 
 	# Keeps our systems sized when popped out
-	if window.name != ROOT and not files_bottom:
+	if window.name != ROOT and not is_in_bottom_panel:
 		window.min_size.y = MIN_HEIGHT
 		fd_info.tree.size.y = new_size.y - PADDING
 		fd_info.container.size.y = new_size.y - PADDING
@@ -193,10 +193,10 @@ func _process(_delta: float) -> void:
 
 ## Toggles the FileSystem dock between the bottom panel and the original dock slot
 func toggle_dock_location() -> void:
-	if files_bottom:
+	if is_in_bottom_panel:
 		remove_control_from_bottom_panel(fd_info.dock)
 		add_control_to_dock(EditorPlugin.DOCK_SLOT_LEFT_BR, fd_info.dock)
-		files_bottom = false
+		is_in_bottom_panel = false
 		return
 
 	fd_info = FDInfo.new(EditorInterface.get_file_system_dock())
@@ -204,4 +204,4 @@ func toggle_dock_location() -> void:
 	if parent:
 		parent.remove_child(fd_info.dock)
 	add_control_to_bottom_panel(fd_info.dock, "File System")
-	files_bottom = true
+	is_in_bottom_panel = true
