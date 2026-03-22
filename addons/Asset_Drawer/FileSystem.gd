@@ -30,14 +30,14 @@ var last_operated: float
 
 
 func _enter_tree() -> void:
-	# Add tool button to move shelf to editor bottom
-	add_tool_menu_item("Files to Bottom", files_to_bottom)
+	# Add tool button to toggle shelf location
+	add_tool_menu_item("Toggle File System Location", toggle_dock_location)
 
 	# Get our file system
 	fd_info = FDInfo.new(EditorInterface.get_file_system_dock())
 
 	await get_tree().create_timer(0.1).timeout
-	files_to_bottom()
+	toggle_dock_location()
 
 	# Prevent file tree from being shrunk on load
 	await get_tree().create_timer(0.1).timeout
@@ -143,8 +143,8 @@ func _input(event: InputEvent) -> void:
 
 
 func _exit_tree() -> void:
-	remove_tool_menu_item("Files to Bottom")
-	files_to_bottom()
+	remove_tool_menu_item("Toggle File System Location")
+	toggle_dock_location()
 	remove_inspector_plugin(inspector)
 
 
@@ -191,8 +191,8 @@ func _process(_delta: float) -> void:
 			window.position = screen_size / 2
 
 
-# Moves the files between the bottom panel and the original dock
-func files_to_bottom() -> void:
+## Toggles the FileSystem dock between the bottom panel and the original dock slot
+func toggle_dock_location() -> void:
 	if files_bottom:
 		remove_control_from_bottom_panel(fd_info.dock)
 		add_control_to_dock(EditorPlugin.DOCK_SLOT_LEFT_BR, fd_info.dock)
