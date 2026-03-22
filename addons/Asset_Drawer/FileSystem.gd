@@ -194,6 +194,8 @@ func files_to_bottom() -> void:
 		return
 
 	fd_info = FDInfo.new(EditorInterface.get_file_system_dock())
-	remove_control_from_docks(fd_info.dock)
+	var parent := fd_info.dock.get_parent()
+	if parent:
+		parent.remove_child(fd_info.dock)
 	add_control_to_bottom_panel(fd_info.dock, "File System")
 	files_bottom = true
