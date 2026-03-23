@@ -12,8 +12,6 @@ const PADDING: int = 20
 const BOTTOM_PADDING: int = 60
 ## Minimum height of the dock
 const MIN_HEIGHT: int = 50
-## Threshold for initial load workaround (ms)
-const INITIAL_LOAD_THRESHOLD = 6000
 
 # [FDInfo.gd]
 const FDInfo = preload("uid://cnhpfa51sruip")
@@ -211,7 +209,8 @@ func toggle_dock_location() -> void:
 
 	else:
 		# (workaround)
-		if Time.get_ticks_msec() > INITIAL_LOAD_THRESHOLD:
+		var p_node := fd_info.dock.get_parent()
+		if p_node is not TabContainer:
 			remove_control_from_docks(fd_info.dock)
 		_remove_from_parent(fd_info.dock)
 		add_control_to_bottom_panel(fd_info.dock, "File System")
