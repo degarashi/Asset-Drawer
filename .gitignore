@@ -12,3 +12,6 @@ data_*/
 
 hubimages/
 Logo.png.import
+
+.editorconfig
+.godot/
