@@ -1,6 +1,7 @@
 @tool
 extends EditorPlugin
 
+# ------------- [Constants] -------------
 # Prevent continuous operation
 const OPERATE_DELAY = 0.25
 ## The root scene
@@ -12,9 +13,12 @@ const BOTTOM_PADDING: int = 60
 ## Minimum height of the dock
 const MIN_HEIGHT: int = 50
 
+# [FDInfo.gd]
 const FDInfo = preload("uid://cnhpfa51sruip")
+# [Inspector.gd]
 const INSPECTOR = preload("uid://dbp3g3xta2t52")
 
+# ------------- [Public Variable] -------------
 var inspector: EditorInspectorPlugin
 var fd_info: FDInfo
 var asset_drawer_shortcut: InputEventKey = InputEventKey.new()
@@ -29,6 +33,7 @@ var showing: bool = false
 var last_operated: float
 
 
+# ------------- [Callbacks] -------------
 func _enter_tree() -> void:
 	# Add tool button to toggle shelf location
 	add_tool_menu_item("Toggle File System Location", toggle_dock_location)
@@ -55,6 +60,70 @@ func _enter_tree() -> void:
 	insp.edited_object_changed.connect(_on_obj_changed)
 
 
+func _exit_tree() -> void:
+	remove_tool_menu_item("Toggle File System Location")
+	toggle_dock_location()
+	remove_inspector_plugin(inspector)
+
+
+func _process(_delta: float) -> void:
+	var window := fd_info.dock.get_window()
+	new_size = window.size
+
+	# Keeps the file system from being unusable in size
+	if window.name == ROOT and not is_in_bottom_panel:
+		fd_info.tree.size.y = new_size.y - PADDING
+		fd_info.container.size.y = new_size.y - PADDING
+		return
+
+	# Adjust the size of the file system based on how far up
+	# the drawer has been pulled
+	if window.name == ROOT and is_in_bottom_panel:
+		var dock_container := fd_info.dock.get_parent()
+		new_size = dock_container.size
+		var editorsettings := EditorInterface.get_editor_settings()
+		var fontsize: int = editorsettings.get_setting("interface/editor/main_font_size")
+		var editorscale := EditorInterface.get_editor_scale()
+
+		var sz_y := new_size.y - (fontsize * 2) - (BOTTOM_PADDING * editorscale)
+
+		# Apply offset for Godot 4.6+ as a workaround
+		var version_info := Engine.get_version_info()
+		if version_info.major >= 4 and version_info.minor >= 6:
+			sz_y += 25
+
+		fd_info.tree.size.y = sz_y
+		fd_info.container.size.y = sz_y
+		return
+
+	# Keeps our systems sized when popped out
+	if window.name != ROOT and not is_in_bottom_panel:
+		window.min_size.y = MIN_HEIGHT
+		fd_info.tree.size.y = new_size.y - PADDING
+		fd_info.container.size.y = new_size.y - PADDING
+
+		# Centers window on first pop
+		if not initial_load:
+			initial_load = true
+			var screen_size := DisplayServer.screen_get_size()
+			window.position = screen_size / 2
+
+
+func _input(event: InputEvent) -> void:
+	if not is_in_bottom_panel:
+		return
+
+	# Asset drawer toggle
+	if asset_drawer_shortcut.is_match(event) and event.is_pressed() and not event.is_echo():
+		if showing:
+			hide_bottom_panel()
+		else:
+			make_bottom_panel_item_visible(fd_info.dock)
+
+		showing = not showing
+
+
+# ------------- [Private Method] -------------
 # Check if OPERATE_DELAY has passed since last_operated & Update time
 func _check_operate_interval() -> bool:
 	if Time.get_unix_time_from_system() - last_operated < OPERATE_DELAY:
@@ -124,73 +193,7 @@ func _on_select_resource(path: String) -> void:
 			_open_path(path)
 
 
-#region show hide filesystem
-func _input(event: InputEvent) -> void:
-	if not is_in_bottom_panel:
-		return
-
-	# Asset drawer toggle
-	if asset_drawer_shortcut.is_match(event) and event.is_pressed() and not event.is_echo():
-		if showing:
-			hide_bottom_panel()
-		else:
-			make_bottom_panel_item_visible(fd_info.dock)
-
-		showing = not showing
-
-
-#endregion
-
-
-func _exit_tree() -> void:
-	remove_tool_menu_item("Toggle File System Location")
-	toggle_dock_location()
-	remove_inspector_plugin(inspector)
-
-
-func _process(_delta: float) -> void:
-	var window := fd_info.dock.get_window()
-	new_size = window.size
-
-	# Keeps the file system from being unusable in size
-	if window.name == ROOT and not is_in_bottom_panel:
-		fd_info.tree.size.y = new_size.y - PADDING
-		fd_info.container.size.y = new_size.y - PADDING
-		return
-
-	# Adjust the size of the file system based on how far up
-	# the drawer has been pulled
-	if window.name == ROOT and is_in_bottom_panel:
-		var dock_container := fd_info.dock.get_parent() as Control
-		new_size = dock_container.size
-		var editorsettings := EditorInterface.get_editor_settings()
-		var fontsize: int = editorsettings.get_setting("interface/editor/main_font_size")
-		var editorscale := EditorInterface.get_editor_scale()
-
-		var sz_y := new_size.y - (fontsize * 2) - (BOTTOM_PADDING * editorscale)
-
-		# Apply offset for Godot 4.6+ as a workaround
-		var version_info := Engine.get_version_info()
-		if version_info.major >= 4 and version_info.minor >= 6:
-			sz_y += 25
-
-		fd_info.tree.size.y = sz_y
-		fd_info.container.size.y = sz_y
-		return
-
-	# Keeps our systems sized when popped out
-	if window.name != ROOT and not is_in_bottom_panel:
-		window.min_size.y = MIN_HEIGHT
-		fd_info.tree.size.y = new_size.y - PADDING
-		fd_info.container.size.y = new_size.y - PADDING
-
-		# Centers window on first pop
-		if not initial_load:
-			initial_load = true
-			var screen_size: Vector2 = DisplayServer.screen_get_size()
-			window.position = screen_size / 2
-
-
+# ------------- [Public Method] -------------
 ## Toggles the FileSystem dock between the bottom panel and the original dock slot
 func toggle_dock_location() -> void:
 	if is_in_bottom_panel:
@@ -199,7 +202,6 @@ func toggle_dock_location() -> void:
 		is_in_bottom_panel = false
 		return
 
-	fd_info = FDInfo.new(EditorInterface.get_file_system_dock())
 	var parent := fd_info.dock.get_parent()
 	if parent:
 		parent.remove_child(fd_info.dock)
