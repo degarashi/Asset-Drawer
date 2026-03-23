@@ -193,6 +193,12 @@ func _on_select_resource(path: String) -> void:
 			_open_path(path)
 
 
+static func _remove_from_parent(node: Node) -> void:
+	var p_node := node.get_parent()
+	if p_node:
+		p_node.remove_child(node)
+
+
 # ------------- [Public Method] -------------
 ## Toggles the FileSystem dock between the bottom panel and the original dock slot
 func toggle_dock_location() -> void:
@@ -202,8 +208,6 @@ func toggle_dock_location() -> void:
 		is_in_bottom_panel = false
 		return
 
-	var parent := fd_info.dock.get_parent()
-	if parent:
-		parent.remove_child(fd_info.dock)
+	_remove_from_parent(fd_info.dock)
 	add_control_to_bottom_panel(fd_info.dock, "File System")
 	is_in_bottom_panel = true
